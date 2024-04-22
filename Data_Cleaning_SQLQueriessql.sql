@@ -23,33 +23,6 @@ SET SaleDateConverted = CONVERT(DATE, SaleDate)
 SELECT SaleDateConverted
 FROM NashvilleHousing;
 -------------------------------------------------------------------------------------
-
--- Populate Property Address Data.
-
-
-SELECT * --PropertyAddress
-FROM NashvilleHousing
--- WHERE PropertyAddress IS NULL;
-ORDER BY ParcelID
-
-SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress, 
-	ISNULL(a.PropertyAddress, b.PropertyAddress)
-FROM NashvilleHousing AS a
-JOIN NashvilleHousing AS b
-ON a.ParcelID = b.ParcelID
-AND a.[UniqueID ] <> b.[UniqueID ]
-WHERE a.PropertyAddress IS NULL
-
-UPDATE a 
-SET PropertyAddress = ISNULL(a.PropertyAddress, b.PropertyAddress)
-FROM NashvilleHousing AS a
-JOIN NashvilleHousing AS b
-ON a.ParcelID = b.ParcelID
-AND a.[UniqueID ] <> b.[UniqueID ]
-WHERE a.PropertyAddress IS NULL
-
------------------------------------------------------------------------------------------
-
 -- Breaking out Address Into Individual Columns (Address, City, State)
 
 SELECT PropertyAddress
@@ -134,27 +107,6 @@ SET SoldAsVacant = CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
 
 ------------------------------------------------------------------------------------------
 
--- Remove Duplicates
-
-WITH RowNumCTE AS
-(
-SELECT *, 
-	ROW_NUMBER() OVER(
-	PARTITION BY ParcelID, 
-				PropertyAddress, 
-				SalePrice, 
-				SaleDate, 
-				LegalReference
-				ORDER BY UniqueID) AS row_num
-FROM NashvilleHousing
--- ORDER BY ParcelID
-)
-SELECT *
-FROM RowNumCTE
-WHERE row_num >1
-ORDER BY PropertyAddress
-
---------------------------------------------------------------------------------------------
 
 -- Delete Unused Columns
 
